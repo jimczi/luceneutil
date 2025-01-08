@@ -46,7 +46,7 @@ DO_PROFILING = False
 
 # test parameters. This script will run KnnGraphTester on every combination of these parameters
 PARAMS = {
-    'ndoc': (10_000_000,),
+    'ndoc': (100000,),
     #'ndoc': (10000, 100000, 200000, 500000),
     #'ndoc': (10000, 100000, 200000, 500000),
     #'ndoc': (2_000_000,),
@@ -59,7 +59,7 @@ PARAMS = {
     'beamWidthIndex': (100, ),
     #'beamWidthIndex': (50,),
     #'fanout': (20, 100, 250)
-    'fanout': (50,),
+    'fanout': (100,),
     #'quantize': None,
     #'quantizeBits': (32, 7, 4),
     'numMergeWorker': (12,),
@@ -69,16 +69,18 @@ PARAMS = {
     'encoding': ('float32',),
     # 'metric': ('angular',),  # default is angular (dot_product)
     # 'metric': ('mip',),
-    #'quantize': (True,),
-    'quantizeBits': (32,),
+    'quantize': (False,),
+    #'quantizeBits': (32,),
     #'fanout': (0,),
     'topK': (100,),
-    'bp': ('false', 'true'),
+    'bp': ('false',),
     #'quantizeCompress': (True, False),
-    'quantizeCompress': (True,),
+    'quantizeCompress': (False,),
     'queryStartIndex': (0,),   # seek to this start vector before searching, to sample different vectors
-    'forceMerge': (True, False)
-    #'niter': (10,),
+    'forceMerge': (True,),
+    'filterSelectivity': (0.01,),
+    'prefilter': (True,),
+    'niter': (1,),
 }
 
 def advance(ix, values):
@@ -116,8 +118,8 @@ def run_knn_benchmark(checkout, values):
 
     # Cohere dataset
     dim = 768
-    doc_vectors = f"/lucenedata/enwiki/{'cohere-wikipedia'}-docs-{dim}d.vec"
-    query_vectors = f"/lucenedata/enwiki/{'cohere-wikipedia'}-queries-{dim}d.vec"
+    doc_vectors = f"/Users/jimczi/sources/benchmarks/data/cohere-wikipedia-docs-768d.vec"
+    query_vectors = f"/Users/jimczi/sources/benchmarks/data/cohere-wikipedia-queries-768d.vec"
     #parentJoin_meta_file = f"{constants.BASE_DIR}/data/{'cohere-wikipedia'}-metadata.csv"
 
     jfr_output = f'{constants.LOGS_DIR}/knn-perf-test.jfr'
@@ -178,13 +180,13 @@ def run_knn_benchmark(checkout, values):
         this_cmd = cmd + args + [
             '-dim', str(dim),
             '-docs', doc_vectors,
-            '-reindex',
             '-search-and-stats', query_vectors,
-            '-numIndexThreads', '8',
+            '-numIndexThreads', '1',
             #'-metric', 'mip',
             # '-parentJoin', parentJoin_meta_file,
             # '-numMergeThread', '8', '-numMergeWorker', '8',
             '-forceMerge',
+            '-reindex',
             #'-stats',
             #'-quiet'
         ]

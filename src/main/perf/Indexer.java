@@ -70,8 +70,6 @@ import org.apache.lucene.index.SerialMergeScheduler;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.index.TieredMergePolicy;
 import org.apache.lucene.index.VectorEncoding;
-import org.apache.lucene.misc.index.BpVectorReorderer;
-import org.apache.lucene.misc.index.BPReorderingMergePolicy;
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.SortField;
 import org.apache.lucene.store.Directory;
@@ -144,8 +142,6 @@ public final class Indexer {
       throw new RuntimeException("unknown MergePolicy " + mergePolicy);
     }
     if (useBP) {
-      BpVectorReorderer reorderer = new BpVectorReorderer(LineFileDocs.VECTOR_FIELD_NAME);
-      mp = new BPReorderingMergePolicy(mp, reorderer);
     }
     return mp;
   }

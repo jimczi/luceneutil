@@ -62,6 +62,7 @@ import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.index.LeafReader;
 import org.apache.lucene.index.LeafReaderContext;
+import org.apache.lucene.index.LogByteSizeMergePolicy;
 import org.apache.lucene.index.SegmentCommitInfo;
 import org.apache.lucene.index.SegmentInfos;
 import org.apache.lucene.index.SegmentReader;
@@ -616,7 +617,9 @@ public class KnnGraphTester {
 
   @SuppressForbidden(reason = "Prints stuff")
   private double forceMerge() throws IOException {
-    IndexWriterConfig iwc = new IndexWriterConfig().setOpenMode(IndexWriterConfig.OpenMode.APPEND);
+    IndexWriterConfig iwc = new IndexWriterConfig()
+            .setOpenMode(IndexWriterConfig.OpenMode.APPEND).setMergePolicy(new LogByteSizeMergePolicy());
+
     iwc.setCodec(getCodec(maxConn, beamWidth, exec, numMergeWorker, quantize, quantizeBits, quantizeCompress));
     System.out.println("Force merge index in " + indexPath);
     long startNS = System.nanoTime();
@@ -890,8 +893,8 @@ public class KnnGraphTester {
     int totalMatches = 0;
     int totalResults = results.length * topK;
     for (int i = 0; i < results.length; i++) {
-      // System.out.println(Arrays.toString(nn[i]));
-      // System.out.println(Arrays.toString(results[i].scoreDocs));
+      System.out.println(Arrays.toString(nn[i]));
+      System.out.println(Arrays.toString(results[i]));
       totalMatches += compareNN(nn[i], results[i]);
     }
     return totalMatches / (float) totalResults;
